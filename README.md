@@ -7,3 +7,22 @@ This repo serves as documentation for the [volkszaehler.org](https://github.com/
 * **IR-Read-Write-Head** with TTL interface that I purchased as a kit with a pre-assembled circuit board from [Hichi]( https://www.photovoltaikforum.com/thread/141332-neue-lesekopf-baus%C3%A4tze-ohne-smd-l%C3%B6ten/).
 * **Raspberry PI 4** with 32 GB SD card and image from [wiki.volkszaehler.org/howto/raspberry_pi_image](https://wiki.volkszaehler.org/howto/raspberry_pi_image).
 * **Siemens TD-3511 smart meter** which has been installed by [EW Wangen SZ]( https://www.ewwangensz.ch/), what is the power supply company in the area where I live.
+
+## Software
+
+The Raspberry PI image can be downloaded on [wiki.volkszaehler.org](https://wiki.volkszaehler.org/howto/raspberry_pi_image) (website only in German language available) or [here](https://demo.volkszaehler.org/downloads/volkszaehler_latest.zip) as `*zip` file. Default passwords of the image are as follows.
+
+| Application                 | User         | Password  |
+|-----------------------------|--------------|-----------|
+| Console                     | pi           | raspberry |
+| ssh (console via network)   | pi           | raspberry |
+| User for vzlogger           | vzlogger     | vzlogger  |
+| MySQL-Standarduser          | vz           | demo      |
+| MySQL-Comprehensiveuser     | vz-admin     | secure    |
+| MySQL-Admin*                | root         | raspberry |
+
+\* since "stretch" an additional security has been built in which only allows the system user root to access the DB as root. (`sudo mysql –user=root -praspberry`)
+
+## Config file
+
+TODO: How to configure.
