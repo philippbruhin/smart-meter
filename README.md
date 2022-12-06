@@ -23,6 +23,25 @@ The Raspberry PI image can be downloaded on [wiki.volkszaehler.org](https://wiki
 
 \* since "stretch" an additional security has been built in which only allows the system user root to access the DB as root. (`sudo mysql –user=root -praspberry`)
 
-## Config file
+## Config file of vzlogger
 
 TODO: How to configure.
+
+## Configure a channel in volkszaheler.org
+
+![Screenhsot of channel adding](./docs/2022-12-06_configure_a_channel_in_volkszaehler.org.png)
+
+## Troubleshooting
+
+1. Check if vzlogger is running with `sudo systemctl status vzlogger`
+
+2. Restart vzlogger with `sudo systemctl restart vzlogger`
+
+3. Enable logging with setting verbosity from 0 to 15 (`"verbosity": 15`) in `./etc/vzlogger.conf`. The logs can be found in `./var/log/vzlogger.log`. There should be some values as follows:
+
+```text
+[Dec 06 21:39:34][mtr0] Reading: id=255-255:1.8.0*255/ObisIdentifier:255-255:1.8.0*255 value=27222854.00 ts=1670359174000
+[Dec 06 21:39:34][mtr0] Reading: id=255-255:2.8.0*255/ObisIdentifier:255-255:2.8.0*255 value=0.00 ts=1670359174000
+[Dec 06 21:39:34][mtr0] Reading: id=255-255:1.7.0*255/ObisIdentifier:255-255:1.7.0*255 value=2406.00 ts=1670359174000
+[Dec 06 21:39:34][mtr0] Reading: id=255-255:2.7.0*255/ObisIdentifier:255-255:2.7.0*255 value=0.00 ts=1670359174000
+```
