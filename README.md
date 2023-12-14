@@ -25,7 +25,35 @@ The Raspberry PI image can be downloaded on [wiki.volkszaehler.org](https://wiki
 
 ## Config file of vzlogger
 
-TODO: How to configure.
+1. Insert the Micro-SD card into the Raspberry PI, connect it to a network and power it.
+
+2. Check the IP address and connect to the Raspberry via [VS-Code](https://code.visualstudio.com/). as shown below
+
+![SSH connection](./docs/2023-12-13_ssh_connection.png)
+
+3. `+ Add New SSH Host...`
+
+4. In my case it is `ssh pi@192.168.1.103` and The password is `raspberry`.
+
+5. To see the file eplorer klick **File** > **Open file...** and then choose the folder `etc`.  Password is again `raspberry`.
+
+6. Open the file `vzlogger.conf` and override the file with the content of [etc/vzlogger.conf](./etc/vzlogger.conf). If you don't have the userrights to override the file, run `sudo chown -R pi /etc`.
+
+7. Run `sudo systemctl enable vzlogger`.
+
+8. Visit [http://192.168.1.103/](http://192.168.1.103/), choose **Kanal erstellen** and add following.
+
+![Power](2023-12-14_power.png)
+
+![Energy](2023-12-1_4_energy.png)
+
+9. As soon as the entries are created once, they can be added later agian via **Private Kanäle**:
+
+    Middleware: `./middleware.php`
+    UUID: `	c83f94f0-9aba-11ee-84d3-39d4445bff26`
+
+    Middleware: `./middleware.php`
+    UUID: `a4e58f50-9aba-11ee-9c72-4da88d6b0291`
 
 ## Configure a channel in volkszaheler.org
 
