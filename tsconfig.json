@@ -1,0 +1,14 @@
+{
+  "compilerOptions": {
+    "target": "ES2020",
+    "module": "ESNext",  // oder "ES6" je nach Bedarf
+    "outDir": "dist",
+    "strict": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "moduleResolution": "node",
+    "declaration": true,  // Falls du auch .d.ts-Dateien möchtest
+    "sourceMap": true  // Falls du Quellmaps für Debugging brauchst
+  },
+  "include": ["src"]
+}

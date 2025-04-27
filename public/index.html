@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <title>Meter Data Viewer</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    body { font-family: Arial; padding: 20px; }
+    canvas { max-width: 100%; margin-bottom: 40px; }
+  </style>
+</head>
+<body>
+  <h1>Meter Data Viewer</h1>
+
+  <h2>Letzte 7 Tage</h2>
+  <canvas id="chart7days" height="100"></canvas>
+
+  <h2>Monatsübersicht</h2>
+  <canvas id="chartMonthly" height="100"></canvas>
+
+  <script>
+    async function loadChart7Days() {
+      const res = await fetch('/api/data/last7days');
+      const data = await res.json();
+
+      const labels = data.map(d => new Date(d.timestamp * 1000).toLocaleDateString() + " " + new Date(d.timestamp * 1000).toLocaleTimeString());
+      const energy = data.map(d => d.positive_active_energy_total);
+
+      const ctx = document.getElementById('chart7days').getContext('2d');
+      new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels,
+          datasets: [{
+            label: 'Energy Total (Wh)',
+            data: energy,
+            borderColor: 'blue',
+            backgroundColor: 'lightblue',
+            fill: false
+          }]
+        },
+        options: {
+          scales: {
+            x: { display: true },
+            y: { display: true }
+          }
+        }
+      });
+    }
+
+    async function loadChartMonthly() {
+      const res = await fetch('/api/data/monthly');
+      const data = await res.json();
+
+      const labels = data.map(d => d.month);
+      const energy = data.map(d => d.energy_consumed);
+
+      const ctx = document.getElementById('chartMonthly').getContext('2d');
+      new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels,
+          datasets: [{
+            label: 'Energy Consumption (Wh) per Month',
+            data: energy,
+            backgroundColor: 'green'
+          }]
+        },
+        options: {
+          scales: {
+            x: { display: true },
+            y: { display: true }
+          }
+        }
+      });
+    }
+
+    loadChart7Days();
+    loadChartMonthly();
+  </script>
+</body>
+</html>

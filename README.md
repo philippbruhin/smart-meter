@@ -1,75 +1,96 @@
-# Electrical power consumption measurement and visualization
+# Meter Data Viewer
 
-This repo serves as documentation for the [volkszaehler.org](https://github.com/volkszaehler/volkszaehler.org) project, which I am using to measure and visualize the electrical consumption of my home (heat pump, oven, washing machine, dryer etc.).
+This project reads meter data from a **Nuoreader** by **Nuotec GmbH** (based in Nuolen, Switzerland) via a simple Node.js backend, stores it into a local SQLite database, and displays the last 7 days and monthly totals in a small web frontend.
 
-## Hardware
+## Requirements
 
-* **IR-Read-Write-Head** with TTL interface that I purchased as a kit with a pre-assembled circuit board from [Hichi]( https://www.photovoltaikforum.com/thread/141332-neue-lesekopf-baus%C3%A4tze-ohne-smd-l%C3%B6ten/).
-* **Raspberry PI 4** with 32 GB SD card and image from [wiki.volkszaehler.org/howto/raspberry_pi_image](https://wiki.volkszaehler.org/howto/raspberry_pi_image).
-* **Siemens TD-3511 smart meter** which has been installed by [EW Wangen SZ]( https://www.ewwangensz.ch/), what is the power supply company in the area where I live.
+- **Node.js** version **v18.19.0** (installed via APT package manager on Raspberry Pi OS)
+- **npm** (comes with Node.js)
+- **sqlite3** (installed via npm)
+- **cron** (standard on Raspberry Pi OS)
 
-## Software
+## Installation
 
-The Raspberry PI image can be downloaded on [wiki.volkszaehler.org](https://wiki.volkszaehler.org/howto/raspberry_pi_image) (website only in German language available) or [here](https://demo.volkszaehler.org/downloads/volkszaehler_latest.zip) as `*zip` file. Default passwords of the image are as follows.
+1. **Clone the repository** or copy the project files to your Raspberry Pi.
 
-| Application                 | User         | Password  |
-|-----------------------------|--------------|-----------|
-| Console                     | pi           | raspberry |
-| ssh (console via network)   | pi           | raspberry |
-| User for vzlogger           | vzlogger     | vzlogger  |
-| MySQL-Standarduser          | vz           | demo      |
-| MySQL-Comprehensiveuser     | vz-admin     | secure    |
-| MySQL-Admin*                | root         | raspberry |
+2. **Install Node.js packages:**
 
-\* since "stretch" an additional security has been built in which only allows the system user root to access the DB as root. (`sudo mysql –user=root -praspberry`)
-
-## Config file of vzlogger
-
-1. Insert the Micro-SD card into the Raspberry PI, connect it to a network and power it.
-
-2. Check the IP address and connect to the Raspberry via [VS-Code](https://code.visualstudio.com/). as shown below
-
-![SSH connection](./docs/2023-12-13_ssh_connection.png)
-
-3. `+ Add New SSH Host...`
-
-4. In my case it is `ssh pi@192.168.1.103` and The password is `raspberry`.
-
-5. To see the file eplorer klick **File** > **Open file...** and then choose the folder `etc`.  Password is again `raspberry`.
-
-6. Open the file `vzlogger.conf` and override the file with the content of [etc/vzlogger.conf](./etc/vzlogger.conf). If you don't have the userrights to override the file, run `sudo chown -R pi /etc`.
-
-7. Run `sudo systemctl enable vzlogger`.
-
-8. Visit [http://192.168.1.103/](http://192.168.1.103/), choose **Kanal erstellen** and add following.
-
-![Power](2023-12-14_power.png)
-
-![Energy](2023-12-1_4_energy.png)
-
-9. As soon as the entries are created once, they can be added later agian via **Private Kanäle**:
-
-    Middleware: `./middleware.php`
-    UUID: `	c83f94f0-9aba-11ee-84d3-39d4445bff26`
-
-    Middleware: `./middleware.php`
-    UUID: `a4e58f50-9aba-11ee-9c72-4da88d6b0291`
-
-## Configure a channel in volkszaheler.org
-
-![Screenhsot of channel adding](./docs/2022-12-06_configure_a_channel_in_volkszaehler.org.png)
-
-## Troubleshooting
-
-1. Check if vzlogger is running with `sudo systemctl status vzlogger`
-
-2. Restart vzlogger with `sudo systemctl restart vzlogger`
-
-3. Enable logging with setting verbosity from 0 to 15 (`"verbosity": 15`) in `./etc/vzlogger.conf`. The logs can be found in `./var/log/vzlogger.log`. There should be some values as follows:
-
-```text
-[Dec 06 21:39:34][mtr0] Reading: id=255-255:1.8.0*255/ObisIdentifier:255-255:1.8.0*255 value=27222854.00 ts=1670359174000
-[Dec 06 21:39:34][mtr0] Reading: id=255-255:2.8.0*255/ObisIdentifier:255-255:2.8.0*255 value=0.00 ts=1670359174000
-[Dec 06 21:39:34][mtr0] Reading: id=255-255:1.7.0*255/ObisIdentifier:255-255:1.7.0*255 value=2406.00 ts=1670359174000
-[Dec 06 21:39:34][mtr0] Reading: id=255-255:2.7.0*255/ObisIdentifier:255-255:2.7.0*255 value=0.00 ts=1670359174000
+```bash
+npm install
 ```
+
+3. Set up the SQLite database:
+
+This project automatically creates the database and necessary tables if they do not exist when starting the server.
+
+4. Edit Configuration:
+
+Adjust the config.js file if needed:
+
+```javascript
+module.exports = {
+  meterApiUrl: 'http://192.168.1.121/meter.json',
+  databasePath: './meterdata.db',
+  serverPort: 3000
+};
+```
+
+5. Run the development server:
+
+```bash
+npm run dev
+```
+
+It will start the server at http://localhost:3000.
+
+6. Set up cronjob for production use:
+
+Open crontab:
+
+```bash
+crontab -e
+```
+
+Add the following lines to fetch the meter data exactly at every 00, 15, 30, and 45 minutes past the hour:
+
+```cron
+0,15,30,45 * * * * /usr/bin/node /path/to/your/project/fetch.js
+```
+
+Replace /path/to/your/project/fetch.js with the actual path to your fetch.js script
+
+7. Start the server in production mode:
+
+You can simply run:
+
+```bash
+npm start
+```
+
+(Or use a tool like pm2 to run it permanently in the background.)
+
+## Project Structure
+
+```bash
+/meter-data-viewer
+├── server.js        # Express server to serve API and frontend
+├── fetch.js         # Script to fetch and store data from the meter
+├── config.js        # Configuration variables
+├── meterdata.db     # SQLite database (created automatically)
+├── public/
+│   └── index.html   # Frontend
+├── package.json     # Project metadata and scripts
+└── README.md        # This file
+```
+
+## Development Notes
+
+- During development, you can run npm run dev which starts the server and lets you test fetching manually by running:
+
+  ```bash
+  node fetch.js
+  ```
+
+- The time alignment is done in cron, so fetches happen precisely at the 0, 15, 30, and 45-minute marks.
+
+- The timestamp correction uses the Raspberry Pi system time minus the `age` field from the meter data.
